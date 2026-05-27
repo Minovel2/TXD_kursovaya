@@ -33,7 +33,7 @@
             <property name="hibernate.hikari.maximumPoolSize"  value="10"/>
             <property name="hibernate.hikari.minimumIdle"      value="2"/>
 
-            <property name="hibernate.hbm2ddl.auto"           value="create"/>
+            <property name="hibernate.hbm2ddl.auto"           value="none"/>
             <property name="hibernate.dialect"
                       value="org.hibernate.dialect.PostgreSQLDialect"/>
 

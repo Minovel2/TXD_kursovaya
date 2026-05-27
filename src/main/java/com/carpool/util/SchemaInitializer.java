@@ -7,53 +7,67 @@ import jakarta.persistence.EntityTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * Инициализация тестовых данных.
- * Создаёт записи в БД, если они ещё не существуют.
+ * Инициализация схемы и тестовых данных.
  */
 public class SchemaInitializer {
 
     private static final Logger log = LoggerFactory.getLogger(SchemaInitializer.class);
 
-    public static void initialize() {
-        // ======== ШАГ 1: СОЗДАНИЕ СХЕМЫ (с транзакцией) ========
-        try (EntityManager em = HibernateUtil.createEntityManager()) {
-            EntityTransaction tx = em.getTransaction();
-            try {
-                tx.begin();
+    /**
+     * Выполняет SQL-скрипт из файла schema.sql.
+     */
+    public static void executeSchema() {
+        String url = "jdbc:postgresql://localhost:5433/postgres";
+        String user = "postgres";
+        String password = "pass123";
 
-                // Проверяем, существует ли схема carpool
-                boolean schemaExists = false;
-                try {
-                    em.createNativeQuery("SELECT 1 FROM information_schema.schemata WHERE schema_name = 'carpool'")
-                            .getSingleResult();
-                    schemaExists = true;
-                } catch (Exception e) {
-                    // Схема не найдена — продолжаем
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             Statement stmt = conn.createStatement()) {
+
+            log.info("Выполнение schema.sql...");
+
+            String sql;
+            try (InputStream is = SchemaInitializer.class.getClassLoader().getResourceAsStream("schema.sql")) {
+                if (is == null) {
+                    throw new RuntimeException("schema.sql не найден в classpath!");
                 }
-
-                if (!schemaExists) {
-                    log.info("Схема carpool не найдена. Создаём...");
-                    em.createNativeQuery("CREATE SCHEMA carpool").executeUpdate();
-                    log.info("Схема carpool успешно создана.");
-                } else {
-                    log.info("Схема carpool уже существует.");
-                }
-
-                tx.commit();
-            } catch (Exception e) {
-                if (tx.isActive()) tx.rollback();
-                log.error("Ошибка при создании схемы carpool: {}", e.getMessage());
-                throw e;
+                sql = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
+                        .lines().collect(Collectors.joining("\n"));
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка при чтении schema.sql: " + e.getMessage(), e);
             }
-        }
 
-        // ======== ШАГ 2: ЗАПОЛНЕНИЕ ДАННЫМИ (новая транзакция) ========
+            // Выполняем весь скрипт
+            stmt.execute(sql);
+
+            log.info("Схема и таблицы успешно созданы.");
+
+        } catch (SQLException | RuntimeException e) {
+            log.error("Ошибка при выполнении schema.sql: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Заполняет базу тестовыми данными.
+     */
+    public static void seedData() {
         EntityManager em = HibernateUtil.createEntityManager();
         EntityTransaction tx = em.getTransaction();
 
@@ -92,7 +106,7 @@ public class SchemaInitializer {
             City kazan = new City("Казань");
             List.of(moscow, spb, tver, novgorod, kazan).forEach(em::persist);
 
-            em.flush(); // Чтобы получить id
+            em.flush();
 
             // 4. Поездки
             OffsetDateTime now = OffsetDateTime.now(ZoneOffset.ofHours(3));
@@ -140,7 +154,7 @@ public class SchemaInitializer {
             em.persist(new Booking(p2, trip1, "Москва", "Санкт-Петербург"));
             em.persist(new Booking(p4, trip3, "Москва", "Новгород"));
 
-            // Обновляем места в поездках (транзакционно, вручную — для примера)
+            // Обновляем места в поездках
             trip1.setAvailableSeats((short) (trip1.getAvailableSeats() - 2));
             trip3.setAvailableSeats((short) (trip3.getAvailableSeats() - 1));
             em.merge(trip1);

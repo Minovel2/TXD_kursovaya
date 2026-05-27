@@ -14,10 +14,15 @@ public class Main {
     public static void main(String[] args) {
         try {
             log.info("=== ЗАПУСК HIBERNATE CARPOOL ===");
+
+            // Шаг 1: Выполняем schema.sql (создаёт схему и таблицы)
+            SchemaInitializer.executeSchema();
+
+            // Шаг 2: Инициализируем Hibernate (он будет работать с существующими таблицами)
             HibernateUtil.getEntityManagerFactory();
 
-            // ЗАПОЛНЕНИЕ ТЕСТОВЫМИ ДАННЫМИ
-            SchemaInitializer.initialize();
+            // Шаг 3: Заполняем данными
+            SchemaInitializer.seedData();
 
             log.info("\n=== ДЕМОНСТРАЦИЯ CRUD ===");
             CrudDemoService crudDemo = new CrudDemoService();
@@ -28,7 +33,7 @@ public class Main {
             queryService.runAll();
 
         } catch (Exception e) {
-            log.error("Ошибка при выполнении программы", e); // <-- Вся информация об ошибке попадёт в лог
+            log.error("Ошибка при выполнении программы", e);
         } finally {
             HibernateUtil.close();
             log.info("Hibernate закрыт. Готово.");
