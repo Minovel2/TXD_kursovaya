@@ -11,7 +11,6 @@ import java.util.List;
 
 /**
  * 10 бизнес-запросов для системы «Карпулинг».
- * Каждый запрос — это реальная задача, которую решает приложение.
  */
 public class BusinessQueryService {
 
@@ -143,16 +142,16 @@ public class BusinessQueryService {
             for (Object[] row : results) {
                 String from = (String) row[0];
                 String to = (String) row[1];
-                Double avgPrice = (Double) row[2]; // <--- ВАЖНО: Double, а не BigDecimal
+                Double avgPrice = (Double) row[2];
                 System.out.printf("     %-20s %-20s %-15.2f%n", from, to, avgPrice);
             }
         }
         printDivider();
     }
 
-    // --- ЗАПРОС 7: Топ-3 самых щедрых пассажиров (по сумме потраченной) ---
+    // --- ЗАПРОС 7: Топ-3 самых богатых пассажиров (по потраченной сумме) ---
     public void topSpenders() {
-        printHeader("7. Топ-3 пассажира по сумме потраченной");
+        printHeader("7. Топ-3 пассажира по потраченной сумме");
         try (EntityManager em = HibernateUtil.createEntityManager()) {
             List<Object[]> results = em.createQuery("""
                 SELECT CONCAT(p.lastName, ' ', p.firstName), SUM(tc.price)

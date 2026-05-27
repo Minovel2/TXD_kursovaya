@@ -16,6 +16,8 @@
         <class>com.carpool.entity.TripCityId</class>
         <class>com.carpool.entity.Booking</class>
         <class>com.carpool.entity.Review</class>
+        <class>com.carpool.entity.CityLink</class>
+        <class>com.carpool.entity.CityLinkId</class>
 
         <properties>
             <property name="jakarta.persistence.jdbc.url"

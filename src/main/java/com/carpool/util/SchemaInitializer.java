@@ -165,6 +165,10 @@ public class SchemaInitializer {
             em.persist(new Review(p2, d2, "Немного опоздали, но в целом нормально", (short) 4));
             em.persist(new Review(p3, d3, "Машина чистая, вежливый водитель", (short) 5));
 
+            // 8. Связи городов (city_links)
+            em.persist(new CityLink(moscow, tver));
+            em.persist(new CityLink(tver, novgorod));
+
             tx.commit();
             log.info("Тестовые данные успешно добавлены.");
 

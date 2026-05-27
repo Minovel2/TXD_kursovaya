@@ -18,7 +18,7 @@ public class Main {
             // Шаг 1: Выполняем schema.sql (создаёт схему и таблицы)
             SchemaInitializer.executeSchema();
 
-            // Шаг 2: Инициализируем Hibernate (он будет работать с существующими таблицами)
+            // Шаг 2: Инициализируем Hibernate
             HibernateUtil.getEntityManagerFactory();
 
             // Шаг 3: Заполняем данными
