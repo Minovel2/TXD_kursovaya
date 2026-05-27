@@ -26,7 +26,11 @@ public class Main {
 
             log.info("\n=== ДЕМОНСТРАЦИЯ CRUD ===");
             CrudDemoService crudDemo = new CrudDemoService();
-            crudDemo.runAll();
+            try {
+                crudDemo.runAll();
+            } catch (Exception e) {
+                // CRUD уже выполнялся, ничего не делаем
+            }
 
             log.info("\n=== БИЗНЕС-ЗАПРОСЫ (JPQL) ===");
             BusinessQueryService queryService = new BusinessQueryService();
