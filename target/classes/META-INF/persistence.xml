@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence
+                                 https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+             version="3.2">
+
+    <persistence-unit name="cinema-pu" transaction-type="RESOURCE_LOCAL">
+        <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <class>com.carpool.entity.Driver</class>
+        <class>com.carpool.entity.Passenger</class>
+        <class>com.carpool.entity.City</class>
+        <class>com.carpool.entity.Trip</class>
+        <class>com.carpool.entity.TripCity</class>
+        <class>com.carpool.entity.TripCityId</class>
+        <class>com.carpool.entity.Booking</class>
+        <class>com.carpool.entity.Review</class>
+
+        <properties>
+            <property name="jakarta.persistence.jdbc.url"
+                      value="jdbc:postgresql://localhost:5433/postgres"/>
+            <property name="jakarta.persistence.jdbc.user"     value="postgres"/>
+            <property name="jakarta.persistence.jdbc.password"  value="pass123"/>
+            <property name="jakarta.persistence.jdbc.driver"
+                      value="org.postgresql.Driver"/>
+
+            <!-- ДОБАВЛЕНА СХЕМА -->
+            <property name="hibernate.default_schema" value="carpool"/>
+
+            <property name="hibernate.connection.provider_class"
+                      value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+            <property name="hibernate.hikari.maximumPoolSize"  value="10"/>
+            <property name="hibernate.hikari.minimumIdle"      value="2"/>
+
+            <property name="hibernate.hbm2ddl.auto"           value="create"/>
+            <property name="hibernate.dialect"
+                      value="org.hibernate.dialect.PostgreSQLDialect"/>
+
+            <property name="hibernate.show_sql"                value="true"/>
+            <property name="hibernate.format_sql"              value="true"/>
+            <property name="hibernate.highlight_sql"           value="true"/>
+            <property name="hibernate.use_sql_comments"        value="true"/>
+
+            <property name="hibernate.jdbc.batch_size"         value="25"/>
+            <property name="hibernate.order_inserts"           value="true"/>
+            <property name="hibernate.order_updates"           value="true"/>
+
+            <property name="hibernate.connection.charSet"      value="UTF-8"/>
+        </properties>
+    </persistence-unit>
+</persistence>
