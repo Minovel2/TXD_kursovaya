@@ -56,7 +56,7 @@ public class SchemaInitializer {
             // Выполняем весь скрипт
             stmt.execute(sql);
 
-            log.info("Схема и таблицы успешно созданы.");
+            log.info("schema.sql успешно выполнен.");
 
         } catch (SQLException | RuntimeException e) {
             log.error("Ошибка при выполнении schema.sql: {}", e.getMessage());
@@ -165,7 +165,7 @@ public class SchemaInitializer {
             em.persist(new Review(p2, d2, "Немного опоздали, но в целом нормально", (short) 4));
             em.persist(new Review(p3, d3, "Машина чистая, вежливый водитель", (short) 5));
 
-            // 8. Связи городов (city_links)
+            // 8. Связи городов (city_links) - фактически не используется
             em.persist(new CityLink(moscow, tver));
             em.persist(new CityLink(tver, novgorod));
 

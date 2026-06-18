@@ -45,7 +45,7 @@ public class BusinessQueryService {
                 FROM Driver d
                 LEFT JOIN Review r ON r.driver.id = d.id
                 GROUP BY d.id, d.lastName, d.firstName
-                ORDER BY AVG(r.rating) DESC
+                ORDER BY AVG(r.rating) DESC NULLS LAST, d.lastName ASC, d.firstName ASC
                 """, Object[].class).getResultList();
 
             System.out.printf("     %-5s %-30s %-10s%n", "ID", "Водитель", "Рейтинг");
@@ -63,17 +63,20 @@ public class BusinessQueryService {
         printHeader("3. Поиск поездок (Москва → Тверь)");
         try (EntityManager em = HibernateUtil.createEntityManager()) {
             List<Trip> trips = em.createQuery("""
-                    SELECT DISTINCT t
-                    FROM Trip t
-                    JOIN t.tripCities tc
-                    WHERE t.departurePoint = :from
-                      AND t.arrivalPoint = :to
-                      AND t.availableSeats > 0
-                      AND t.status = 0
-                    ORDER BY t.departureDateTime
-                    """, Trip.class)
+                SELECT t
+                FROM Trip t
+                WHERE t.departurePoint = :from
+                  AND t.id IN (
+                      SELECT tc.trip.id
+                      FROM TripCity tc
+                      WHERE tc.city.name = :viaPoint
+                  )
+                  AND t.availableSeats > 0
+                  AND t.status = 0
+                ORDER BY t.departureDateTime
+                """, Trip.class)
                     .setParameter("from", "Москва")
-                    .setParameter("to", "Тверь")
+                    .setParameter("viaPoint", "Тверь")
                     .getResultList();
 
             System.out.println("     Найдено поездок: " + trips.size());
@@ -82,6 +85,7 @@ public class BusinessQueryService {
                         t.getId(), t.getDriver().getFullName(), t.getDepartureDateTime(), t.getAvailableSeats());
             }
         }
+        System.out.println("ВАЖНО! Поездки с количеством свободных мест = 0 не пишутся!");
         printDivider();
     }
 

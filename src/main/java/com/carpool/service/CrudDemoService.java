@@ -104,7 +104,6 @@ public class CrudDemoService {
     public void demoUpdate() {
         printHeader("UPDATE — Обновление данных");
 
-        // Обновляем номер телефона водителя (у него нет телефона в модели, обновим город проживания, если бы он был)
         // Для примера обновим название города
         cityRepo.findByName("Рязань").ifPresent(city -> {
             String oldName = city.getName();
@@ -140,19 +139,14 @@ public class CrudDemoService {
     public void demoTransaction() {
         printHeader("TRANSACTION — Бронирование места");
 
-        // Нужна поездка с местами. Возьмём id поездки, созданной в DataSeeder.
-        // Предположим, она есть (trip_id=1). Уменьшаем места.
 
         System.out.println("Бронирование: пассажир=2, поездка=1");
         try {
-            // createBooking уже содержит транзакцию и уменьшение мест
             Booking booking = bookingRepo.createBooking(2, 1L, "Москва", "Тверь");
             System.out.printf("Бронирование создано! id=%d%n", booking.getId());
 
             System.out.println("\nПопытка забронировать место в той же поездке, но места закончились...");
             // Этот вызов упадёт, если мест нет. В DataSeeder мест было 3, мы одно заняли.
-            // Для теста можно создать новую поездку или изменить логику.
-            // bookingRepo.createBooking(3, 1L, "Москва", "Тверь");
 
         } catch (IllegalStateException e) {
             System.out.printf("Ожидаемая ошибка: %s%n", e.getMessage());
